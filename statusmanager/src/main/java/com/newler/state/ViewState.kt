@@ -1,8 +1,6 @@
 package com.newler.state
 
 import androidx.annotation.IntDef
-import java.lang.annotation.Inherited
-import java.lang.annotation.RetentionPolicy
 
 /**
  *

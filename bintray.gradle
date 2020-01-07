@@ -1,23 +1,21 @@
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.github.dcendents.android-maven'
+
 
 Properties properties = new Properties()
-boolean isHasFile = false
-if (project.rootProject.findProject('local.properties') != null){
-    isHasFile = true
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-}
+properties.load(new FileInputStream("./bintray.properties"))
 
-def gitUrl = ''   // Git仓库的url
-def siteUrl = ''   // 项目的主页
+def gitUrl = 'https://github.com/LeLe673893702/statusview.git'   // Git仓库的url
+def siteUrl = 'https://github.com/LeLe673893702/statusview'   // 项目的主页
 
 version = rootProject.ext["versionName"]
 group = "com.newler"
 
 
 bintray {
-    user = isHasFile ? properties.getProperty("bintray_user") : System.getenv("bintray_user")
-    key = isHasFile ? properties.getProperty("bintray_apikey") : System.getenv("bintray_apikey")
+    tasks.withType(Javadoc).all {
+        enabled = false
+    }
+    user = properties.getProperty("bintray_user")
+    key = properties.getProperty("bintray_apikey")
 
     pkg {
         repo = 'maven'
@@ -41,6 +39,9 @@ bintray {
 
 
 install {
+    tasks.withType(Javadoc).all {
+        enabled = false
+    }
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
         pom {
@@ -79,14 +80,31 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 task javadoc(type: Javadoc) {
-    failOnError false
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    options.encoding = 'UTF-8'
 }
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+
+task dokkaJavadoc(type:  dokka.getClass()) {
+    outputFormat = 'javadoc'
+    outputDirectory = javadoc.destinationDir
+}
+task generateJavadoc(type: Jar, dependsOn: dokkaJavadoc) {
+    group = 'jar'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+task generateSourcesJar(type: Jar) {
+    group = 'jar'
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+
 artifacts {
     archives javadocJar
     archives sourcesJar
