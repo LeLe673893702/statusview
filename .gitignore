@@ -12,3 +12,6 @@
 /captures
 .externalNativeBuild
 .cxx
+libs/
+bintray.gradle
+bintray.properties
