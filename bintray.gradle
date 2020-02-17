@@ -1,14 +1,11 @@
-
-
 Properties properties = new Properties()
-properties.load(new FileInputStream("./bintray.properties"))
+properties.load(new FileInputStream("E:/AndroidCode/statusview/bintray.properties"))
 
 def gitUrl = 'https://github.com/LeLe673893702/statusview.git'   // Git仓库的url
 def siteUrl = 'https://github.com/LeLe673893702/statusview'   // 项目的主页
 
 version = rootProject.ext["versionName"]
 group = "com.newler"
-
 
 bintray {
     tasks.withType(Javadoc).all {

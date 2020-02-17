@@ -2,6 +2,7 @@ package com.newler.statusview.wrapactivity;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -44,11 +45,13 @@ public class GlobalSuccessActivity extends BaseActivity {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         showLoadFailed();
+                        Log.e("failed", "失败");
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        Log.e("succeed", "成功");
                         showLoadSuccess();
                         return false;
                     }

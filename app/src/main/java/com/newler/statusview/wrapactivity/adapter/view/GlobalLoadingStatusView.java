@@ -9,11 +9,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.newler.state.StateView;
 import com.newler.state.ViewState;
 import com.newler.statusview.R;
-
-import org.jetbrains.annotations.NotNull;
 
 import static com.newler.statusview.util.Util.isNetworkConnected;
 
@@ -24,13 +21,13 @@ import static com.newler.statusview.util.Util.isNetworkConnected;
  * @since 19/3/19 23:12
  */
 @SuppressLint("ViewConstructor")
-public class GlobalLoadingStatusView extends LinearLayout implements View.OnClickListener, StateView {
+public class GlobalLoadingStatusView extends LinearLayout implements View.OnClickListener {
 
     private final TextView mTextView;
     private final Runnable mRetryTask;
     private final ImageView mImageView;
 
-    public GlobalLoadingStatusView(Context context, Runnable retryTask) {
+    public GlobalLoadingStatusView(Context context, Runnable retryTask, @ViewState int state) {
         super(context);
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER_HORIZONTAL);
@@ -39,6 +36,7 @@ public class GlobalLoadingStatusView extends LinearLayout implements View.OnClic
         mTextView = findViewById(R.id.text);
         this.mRetryTask = retryTask;
         setBackgroundColor(0xFFF0F0F0);
+        showState(state);
     }
 
     public void setMsgViewVisibility(boolean visible) {
@@ -53,13 +51,6 @@ public class GlobalLoadingStatusView extends LinearLayout implements View.OnClic
         }
     }
 
-    @NotNull
-    @Override
-    public View getView() {
-        return this;
-    }
-
-    @Override
     public void showState(int state) {
         boolean show = true;
         OnClickListener onClickListener = null;

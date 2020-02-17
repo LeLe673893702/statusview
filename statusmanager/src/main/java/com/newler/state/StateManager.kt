@@ -27,7 +27,7 @@ class StateManager {
         @JvmStatic
         val instance : StateManager by lazy {
             StateManager()
-       }
+        }
 
         fun from(adapter: Adapter) : StateManager {
             val stateManager = StateManager()
@@ -37,7 +37,7 @@ class StateManager {
     }
 
     interface Adapter {
-        fun getView(holder: Holder, viewState: Int): StateView
+        fun getView(holder: Holder, @ViewState viewState: Int): View
     }
 
     fun initAdapter(adapter: Adapter) {
@@ -45,19 +45,30 @@ class StateManager {
     }
 
     fun wrap(activity : Activity) : Holder? {
-        adapter?.let {
-            return Holder(it, activity.applicationContext, activity.findViewById(android.R.id.content))
+        val rootViewGroup = activity.window?.decorView?.findViewById<View>(android.R.id.content) as? ViewGroup
+        if (rootViewGroup?.childCount?:0 >0) {
+            val contentView = rootViewGroup?.getChildAt(0)
+            contentView?.apply {
+                adapter?.let {
+                    return Holder(it, activity.applicationContext,
+                        activity.findViewById(android.R.id.content), this)
+                }
+            }
         }
+
         return null
     }
 
-    fun wrap(view : View) : Holder? {
-        val parent = view.parent
+    /**
+     * 包裹contentView
+     */
+    fun wrap(contentView : View) : Holder? {
+        val parent = contentView.parent
         parent?.let {
             if (it is RelativeLayout || it is ConstraintLayout) {
-                return cover(view, it)
+                return cover(contentView, it)
             } else {
-                return warp(view, it)
+                return warp(contentView, it)
             }
         }
 
@@ -67,9 +78,9 @@ class StateManager {
     /**
      * 如果RelativeLayout或ConstraintLayout平级覆盖
      */
-    private fun cover(view : View, parent:ViewParent) :Holder? {
+    private fun cover(contentView : View, parent:ViewParent) :Holder? {
         adapter?.let {
-            return Holder(it, view.context.applicationContext, parent as ViewGroup)
+            return Holder(it, contentView.context.applicationContext, parent as ViewGroup, contentView)
         }
         return null
     }
@@ -77,10 +88,10 @@ class StateManager {
     /**
      * 如果是其他布局，FrameLayout将contentView和stateView全部包裹进来
      */
-    private fun warp(view : View, parent:ViewParent) :Holder? {
+    private fun warp(contentView : View, parent:ViewParent) :Holder? {
         adapter?.let {
-            val wrapper = FrameLayout(view.context)
-            val lp =  view.layoutParams
+            val wrapper = FrameLayout(contentView.context)
+            val lp =  contentView.layoutParams
             lp?.let {
                 lp.height = ViewGroup.LayoutParams.MATCH_PARENT
                 lp.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -88,11 +99,11 @@ class StateManager {
 
             // 先移除已经添加原来布局的contentView
             if (parent is ViewGroup) {
-                val index = parent.indexOfChild(view)
-                parent.removeView(view)
+                val index = parent.indexOfChild(contentView)
+                parent.removeView(contentView)
                 parent.addView(wrapper, index)
-                parent.addView(view, FrameLayout.LayoutParams(-1, -1))
-                return Holder(it, view.context.applicationContext, wrapper)
+                parent.addView(contentView, FrameLayout.LayoutParams(-1, -1))
+                return Holder(it, contentView.context.applicationContext, wrapper, contentView)
             }
         }
 
@@ -100,13 +111,17 @@ class StateManager {
     }
 
     class Holder(private val adapter: Adapter, private val context: Context,
-                 private val wrapper: ViewGroup) {
+                 private val wrapper: ViewGroup, private val contentView: View) {
         private var currentState : Int = ViewState.CONTENT
         private val stateViewListeners: SparseArray<Runnable> by lazy {
             SparseArray<Runnable>(1)
         }
-        private val stateViews : SparseArray<StateView> by lazy {
-            SparseArray<StateView>(4)
+        private val stateViews : SparseArray<View> by lazy {
+            SparseArray<View>(4)
+        }
+
+        init {
+            stateViews.put(ViewState.CONTENT, contentView)
         }
 
         fun showState(viewState : Int) {
@@ -118,9 +133,9 @@ class StateManager {
 
             try {
                 // 页面中包含该状态view
-                if (wrapper.indexOfChild(stateViews[viewState]?.getView()) >= 0) {
+                if (wrapper.indexOfChild(stateViews[viewState]) >= 0) {
                     stateViews.forEach { key, stateView ->
-                        stateView.getView().visibility = if (key == viewState) {
+                        stateView.visibility = if (key == viewState) {
                             View.VISIBLE
                         } else {
                             View.GONE
@@ -129,18 +144,17 @@ class StateManager {
                     return
                 }
 
-                // 如果不包含该view从缓存中取，如果没有获取新的view
+                // 先从缓存view中获取，没有缓存则通过adapter获取新的view
                 val stateView = stateViews[viewState] ?: adapter.getView(this, viewState)
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    stateView.getView().elevation = Float.MAX_VALUE
+                    stateView.elevation = Float.MAX_VALUE
                 }
 
                 // 添加到页面中
-                addStateView(stateView.getView(), wrapper)
+                addStateView(stateView, wrapper)
 
                 stateViews.put(viewState, stateView)
-                stateView.showState(viewState)
             } catch (e:Exception) {
                 e.printStackTrace()
             }
@@ -197,13 +211,7 @@ class StateManager {
         /**
          * 获取stateView，用于部分页面修改控件某些参数的需求
          */
-        fun getStateView(viewState: Int) : StateView {
-            if (stateViews[viewState] == null) {
-                val view = stateViews[viewState]
-                stateViews.put(viewState, view)
-                return view
-            }
-
+        fun getStateView(viewState: Int) : View? {
             return stateViews[viewState]
         }
 
