@@ -50,7 +50,7 @@ class StateManager {
             val contentView = rootViewGroup?.getChildAt(0)
             contentView?.apply {
                 adapter?.let {
-                    return Holder(it, activity.applicationContext,
+                    return Holder(it, activity,
                         activity.findViewById(android.R.id.content), this)
                 }
             }
@@ -80,7 +80,7 @@ class StateManager {
      */
     private fun cover(contentView : View, parent:ViewParent) :Holder? {
         adapter?.let {
-            return Holder(it, contentView.context.applicationContext, parent as ViewGroup, contentView)
+            return Holder(it, contentView.context, parent as ViewGroup, contentView)
         }
         return null
     }
@@ -102,9 +102,9 @@ class StateManager {
                 val index = parent.indexOfChild(contentView)
                 parent.removeView(contentView)
                 parent.addView(wrapper, index)
-                parent.addView(contentView, FrameLayout.LayoutParams(-1, -1))
-                return Holder(it, contentView.context.applicationContext, wrapper, contentView)
             }
+            wrapper.addView(contentView, FrameLayout.LayoutParams(-1, -1))
+            return Holder(it, contentView.context, wrapper, contentView)
         }
 
         return null

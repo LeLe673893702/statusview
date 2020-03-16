@@ -19,7 +19,6 @@ public class GlobalAdapter implements StateManager.Adapter {
     @NotNull
     @Override
     public View getView(@NotNull StateManager.Holder holder, @ViewState int viewState) {
-        return new GlobalLoadingStatusView(holder.getContext(),
-                holder.getViewStateListener(ViewState.LOAD_FAILED), viewState);
+        return new GlobalStatusView(holder.getContext(), viewState, holder);
     }
 }

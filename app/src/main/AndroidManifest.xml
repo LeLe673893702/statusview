@@ -20,9 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".wrapactivity.WrapActivityActivity" android:label="@string/to_wrap_activity"/>
+        <activity android:name=".wrapactivity.WrapActivityActivity"
+            android:label="@string/to_wrap_activity"/>
         <activity android:name=".wrapactivity.GlobalSuccessActivity" android:label="@string/to_load_success"/>
-        <activity android:name=".wrapactivity.GlobalFailedActivity" android:label="@string/load_failed"/>
+        <activity android:name=".wrapactivity.GlobalFailedActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/load_failed"/>
         <activity android:name=".wrapactivity.GlobalEmptyActivity" android:label="@string/to_load_empty"/>
     </application>
 
