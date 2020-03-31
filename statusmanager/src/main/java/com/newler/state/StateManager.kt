@@ -101,7 +101,7 @@ class StateManager {
             if (parent is ViewGroup) {
                 val index = parent.indexOfChild(contentView)
                 parent.removeView(contentView)
-                parent.addView(wrapper, index)
+                parent.addView(wrapper, index, FrameLayout.LayoutParams(-1, -1))
             }
             wrapper.addView(contentView, FrameLayout.LayoutParams(-1, -1))
             return Holder(it, contentView.context, wrapper, contentView)
