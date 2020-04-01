@@ -11,7 +11,6 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.util.forEach
-import java.lang.Exception
 
 /**
  *
@@ -65,10 +64,10 @@ class StateManager {
     fun wrap(contentView : View) : Holder? {
         val parent = contentView.parent
         parent?.let {
-            if (it is RelativeLayout || it is ConstraintLayout) {
-                return cover(contentView, it)
+            return if (it is RelativeLayout || it is ConstraintLayout) {
+                cover(contentView, it)
             } else {
-                return warp(contentView, it)
+                warp(contentView, it)
             }
         }
 
@@ -93,8 +92,7 @@ class StateManager {
             val wrapper = FrameLayout(contentView.context)
             val lp =  contentView.layoutParams
             lp?.let {
-                lp.height = ViewGroup.LayoutParams.MATCH_PARENT
-                lp.width = ViewGroup.LayoutParams.MATCH_PARENT
+                wrapper.layoutParams = lp
             }
 
             // 先移除已经添加原来布局的contentView
@@ -143,6 +141,9 @@ class StateManager {
                     }
                     return
                 }
+
+                // 如果找不到，其他的状态view也要隐藏
+                stateViews.forEach { key, stateView -> stateView.visibility = View.GONE }
 
                 // 先从缓存view中获取，没有缓存则通过adapter获取新的view
                 val stateView = stateViews[viewState] ?: adapter.getView(this, viewState)

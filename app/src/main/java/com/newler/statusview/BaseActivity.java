@@ -2,6 +2,9 @@ package com.newler.statusview;
 
 import android.app.Activity;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.newler.state.Gloading;
 import com.newler.state.StateManager;
 
 /**
@@ -9,9 +12,9 @@ import com.newler.state.StateManager;
  * @author billy.qi
  * @since 19/3/19 21:15
  */
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends AppCompatActivity {
 
-    protected StateManager.Holder mHolder;
+    protected Gloading.Holder mHolder;
 
     /**
      * make a Gloading.Holder wrap with current activity by default
@@ -20,7 +23,7 @@ public abstract class BaseActivity extends Activity {
     protected void initLoadingStatusViewIfNeed() {
         if (mHolder == null) {
             //bind status view to activity root view by default
-            mHolder = StateManager.getInstance().wrap(this).withRetryListener(new Runnable() {
+            mHolder = Gloading.getDefault().wrap(this).withRetry(new Runnable() {
                 @Override
                 public void run() {
                     onLoadRetry();
@@ -40,7 +43,7 @@ public abstract class BaseActivity extends Activity {
 
     public void showLoadSuccess() {
         initLoadingStatusViewIfNeed();
-        mHolder.showContent();
+        mHolder.showLoadSuccess();
     }
 
     public void showLoadFailed() {
