@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.util.forEach
+import androidx.viewpager.widget.ViewPager
 
 /**
  *
@@ -64,7 +65,7 @@ class StateManager {
     fun wrap(contentView : View) : Holder? {
         val parent = contentView.parent
         parent?.let {
-            return if (it is RelativeLayout || it is ConstraintLayout) {
+            return if (it is RelativeLayout || it is ConstraintLayout || it is ViewPager) {
                 cover(contentView, it)
             } else {
                 warp(contentView, it)

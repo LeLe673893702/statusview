@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_state.view.*
 class StateFragment : Fragment() {
    private val holder by lazy {
         view?.let {
-            StateManager.instance.wrap(it.tvState)
+            StateManager.instance.wrap(it)
         }
     }
     companion object {
