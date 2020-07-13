@@ -78,7 +78,7 @@ class StateManager {
     /**
      * 如果RelativeLayout或ConstraintLayout平级覆盖
      */
-    private fun cover(contentView : View, parent:ViewParent) :Holder? {
+    fun cover(contentView : View, parent:ViewParent) :Holder? {
         adapter?.let {
             return Holder(it, contentView.context, parent as ViewGroup, contentView)
         }
@@ -88,7 +88,7 @@ class StateManager {
     /**
      * 如果是其他布局，FrameLayout将contentView和stateView全部包裹进来
      */
-    private fun warp(contentView : View, parent:ViewParent) :Holder? {
+    fun warp(contentView : View, parent:ViewParent) :Holder? {
         adapter?.let {
             val wrapper = FrameLayout(contentView.context)
             val lp =  contentView.layoutParams
